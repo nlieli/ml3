@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 def base_model(X, y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-    neigh = KNeighborsClassifier(n_neighbors=10)
+    neigh = KNeighborsClassifier(n_neighbors=10, weights='distance')
     neigh.fit(X_train, y_train)
 
     y_pred = neigh.predict(X_test)
@@ -18,4 +18,4 @@ def base_model(X, y):
     f1_macro = f1_score(y_test, y_pred, average="macro")
 
     print("\n-------Base Model Results-------")
-    print(f"Accuracy = {accuracy}, Recall = {recall}, Precision = {precision}, F1 = {f1}, f1_macro = {f1_macro}")
+    print(f"Accuracy = {accuracy}, \nRecall = {recall}, \nPrecision = {precision}, \nF1 = {f1}, \nf1_macro = {f1_macro}")
