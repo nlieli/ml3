@@ -12,7 +12,7 @@ from Base_model import base_model
 from XGB_model import train_xgboost_model
 from svm import train_svm
 from gradient_descent import train_gradient_descent_model
-# from tensorflow_model import tensorflow_model
+from tensorflow_model import tensorflow_model
 import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -129,18 +129,18 @@ def main():
     X_without_outliers = X[~outlier_mask_train]
     y_without_outliers = y[~outlier_mask_train]
 
-    X_train, X_test, y_train, y_test = train_test_split(X_without_outliers, y_without_outliers, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X_without_outliers, y_without_outliers, test_size=0.3, random_state=42)
 
 
 
-    '''
+    # '''
     pipeline = Pipeline([
     ("power", PowerTransformer(method="yeo-johnson")),
-    ("poly",  PolynomialFeatures(degree=3, include_bias=True)),
+    ("poly",  PolynomialFeatures(degree=3, include_bias=False)),
     ("scale", StandardScaler()),
     ("model", xgb.XGBClassifier(
-         n_estimators=100,
-         max_depth=8,
+         n_estimators=190,
+         max_depth=110,
          learning_rate=0.1,
          objective="multi:softmax",
          num_class=4,
@@ -157,13 +157,13 @@ def main():
     print(f"Precision Score: {precision_score(y_test, y_pred, average=None)}")
     print(f"F1 Score: {f1_score(y_test, y_pred, average=None)}")
     print(f"F1 Macro Score: {f1_score(y_test, y_pred, average='macro')}")
-    '''
+    # '''
 
 
 
     # base_model(X, y)
 
-    # results = tensorflow_model(X, y, test_size=0.2, epochs=200, batch_size=1048, random_state=42)
+    # results = tensorflow_model(X_without_outliers, y_without_outliers, test_size=0.2, epochs=700, batch_size=2096, random_state=42)
     # print(f"Tensorflow: {results}")
 
     # rf_model, metrics = train_random_forest(X_train, y_train, X_test, y_test)
