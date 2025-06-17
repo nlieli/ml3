@@ -177,7 +177,7 @@ class PIP_Model(Model):
             'select__k': ['all'],
             'model__max_depth': [110],
             },
-            cv=5,
+            cv=2,
             scoring='f1_macro'
           )
         gs.fit(X_train, y_train)
