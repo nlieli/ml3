@@ -25,14 +25,14 @@ class Outlier_Detector:
         log_probs: np.ndarray = self.gmm.score_samples(X_train)
         self.threshold = np.percentile(log_probs, 100 * outlier_fraction)
 
-    def __predict(self, X: np.ndarray):
+    def predict(self, X: np.ndarray):
         # predicts outliers in dataset X
         log_probs_new = self.gmm.score_samples(X)
         return log_probs_new < self.threshold
 
     def filter(self, X: np.ndarray, y: np.ndarray = np.ndarray([])) -> np.ndarray:
         # removes all outliers from the data set X 
-        mask = self.__predict(X)
+        mask = self.predict(X)
         X_filtered = X[~mask]
         y_fitlered = np.ndarray([]) 
         if y is not np.empty:
@@ -159,7 +159,7 @@ class PIP_Model(Model):
         ("power", PowerTransformer(method="yeo-johnson")),
         ("poly",  PolynomialFeatures(degree=3, include_bias=False)),
         ("scale", StandardScaler()),
-        ("select", SelectKBest(f_classif)),
+        ("select", SelectKBest(score_func=f_classif)),
         ("model", XGBClassifier(
              n_estimators=190,
              max_depth=110,
@@ -171,11 +171,15 @@ class PIP_Model(Model):
         ])
 
     def train(self, X_train: np.ndarray, y_train: np.ndarray):
-        gs = GridSearchCV(self.model, 
-                          {'select__k': [8, 9, 10, 11, 'all']},
-                          cv=5,
-                          scoring='f1_macro'
-                          )
+        gs = GridSearchCV(
+            self.model, 
+            {
+            'select__k': ['all'],
+            'model__max_depth': [110],
+            },
+            cv=5,
+            scoring='f1_macro'
+          )
         gs.fit(X_train, y_train)
         self.model = gs.best_estimator_
         # self.model.fit(X_train, y_train)
